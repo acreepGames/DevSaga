@@ -473,9 +473,9 @@ input[type=number]{color:var(--ink);background:var(--card);border:1.5px solid va
 <div id="app">
   <div class="scene-wrap">
     <div class="top">
-      <div class="date"><span id="dDate">Jan 1987</span><small id="dWeek">Minggu 1</small></div>
+      <div class="date"><span id="dDate">Jan 1987</span><small id="dWeek"></small></div>
       <div class="stats">
-        <span class="stat money" id="sMoney">500rb</span>
+        <span class="stat money" id="sMoney"></span>
         <span class="stat fans" id="sFans">👥 0</span>
         <span class="stat" id="sRp">🔬 0</span>
       </div>
@@ -484,7 +484,7 @@ input[type=number]{color:var(--ink);background:var(--card);border:1.5px solid va
     </div>
     <canvas id="cv3d"></canvas>
     <canvas id="cv" width="320" height="180"></canvas>
-    <div class="era-badge" id="eraBadge">🏫 Kantor Sewa</div>
+    <div class="era-badge" id="eraBadge"></div>
     <div class="miniProgStack" id="miniProgStack" style="display:none"></div>
     <div id="fpsDisplay" style="position:absolute;top:2px;right:4px;font-size:9px;font-family:monospace;color:#4ade80;background:rgba(0,0,0,.45);padding:1px 6px;border-radius:6px;z-index:2;pointer-events:none"></div>
     <div class="status salesFloat" id="chartStrip" style="display:none"></div>
@@ -514,7 +514,7 @@ input[type=number]{color:var(--ink);background:var(--card);border:1.5px solid va
   <div class="toasts" id="toasts"></div>
   <div class="toastsB" id="toastsB"></div>
   <div id="techNotifCard" style="display:none">
-    <button class="techNotifClose" onclick="dismissTechNotif()">✕</button>
+    <button class="techNotifClose" onclick="itutTryClose('dismissTechNotif')">✕</button>
     <div class="techNotifTitle" id="techNotifTitle"></div>
     <div class="techNotifName" id="techNotifName"></div>
     <button class="techNotifGo" id="techNotifGoBtn" onclick="techNotifGo()"></button>
@@ -569,7 +569,7 @@ const rf=(a,b)=>Math.random()*(b-a)+a;
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const d2=v=>v.toFixed(2).replace(/\.?0+$/,'').replace('.',',');
+const d2=v=>{const s=v.toFixed(2).replace(/\.?0+$/,'');return LANG==='en'?s:s.replace('.',',');};
 function fmtStorage(mb){
   if(mb>=1e6) return (mb/1e6).toFixed(1)+'TB';
   if(mb>=1e3) return (mb/1e3).toFixed(1)+'GB';
@@ -607,7 +607,9 @@ function detectRegionLang(){
     return 'en';
   }catch(e){ return 'id'; }
 }
-let LANG=detectRegionLang();
+const LANG_KEY='devSagaLang';
+function storedLang(){ try{ const v=localStorage.getItem(LANG_KEY); return (v==='en'||v==='id')?v:null; }catch(e){ return null; } }
+let LANG=storedLang()||detectRegionLang();
 const I18N={
  slotEmpty:['Kosong','Empty'], slotContinueBtn:['▶ Lanjutkan',' Continue'], slotNewBtn:['✦ Mulai Petualangan Baru','✦ Start New Adventure'],
  loadGameTitle:['📂 Load Game','📂 Load Game'], pickSaveTitle:['🔀 Pilih Save','🔀 Pick Save'],
@@ -694,7 +696,7 @@ const I18N={
  usersLbl:['👥 User:','👥 Users:'], devsLbl:['🛠️ Developer:','🛠️ Developers:'],
  gamesInStoreTitle:['Game di Toko','Games in Store'],
  sizeSmall:['🕹️ Kecil','🕹️ Small'], sizeMed:['🕹️ Sedang','🕹️ Medium'], sizeBig:['🕹️ Besar','🕹️ Large'], sizeAAA:['🕹️ AAA','🕹️ AAA'],
- totalLbl:['Total','Total'], lastMonthIncome:['Pendapatan bulan lalu:','Last month\\u2019s income:'],
+ totalLbl:['Total','Total'], lastMonthIncome:['Pendapatan bulan lalu:','Last month\u2019s income:'],
  storeFeaturesTitle:['✅ Fitur Toko','✅ Store Features'],
  updateRunning:['🔄 Update sedang berjalan — selesai dalam ','🔄 Update in progress — done in '], daysLeft2:[' hari',' days'],
  updateStoreBtn:['🔄 Update Toko — ','🔄 Update Store — '],
@@ -724,7 +726,7 @@ const I18N={
  howManyLbl1:['Berapa ','How many '], howManyLbl2:[' anda ingin memberikan diskon ini?',' do you want to run this discount for?'],
  weekUnit:['minggu','week'], monthUnit:['bulan','month'],
  discAppliedMsg:['🏷️ Diskon diterapkan selama ','🏷️ Discount applied for '],
- pkgTitle:['📦 Paket ','📦 Package '], freeLbl2:['Gratis ','Free '], gameScaleLbl:[' game skala ',' scale game '],
+ pkgTitle:['📦 Paket ','📦 Package '], freeLbl2:['Gratis ','Free '], freeScaleLbl:[' game skala ',' scale game '],
  discLbl2:['Diskon ','Discount '], harga2:['Harga:','Price:'], recApprox:['rekomendasi ≈ ','recommended ≈ '],
  customersLbl:['👥 Pelanggan:','👥 Customers:'], deactivateBtn:['Nonaktifkan','Deactivate'], activateBtn:['Aktifkan','Activate'],
  reqLbl:['🔒 Syarat: ','🔒 Requirement: '], pkgStoreTitle:['📦 Paket Toko','📦 Store Packages'],
@@ -960,12 +962,59 @@ const I18N={
  dayWord:['Hari ','Day '], kiriBtn:['⟲ Kiri','⟲ Left'], kananBtn:['⟳ Kanan','⟳ Right'],
  intro2:[', mahasiswa yang diam-diam ngoding game di sela kuliah, pakai komputer kampus seadanya. Siapa sangka, semuanya dimulai dari sini…', ', a student secretly coding games between classes, on whatever campus computers were free. Little did they know, this is where it all began…'],
  subRej:['Submisi ditolak.','Submission rejected.'],
+ wizPhase:['Fase ','Phase '],
+ gameNameLbl:['Nama game:','Game name:'], gameNamePh:['Nama game\u2026','Game name\u2026'],
+ audioTypeCat:['Jenis Audio','Audio Type'],
+ styleCostLbl:['Biaya style: ','Style cost: '],
+ audioCostLbl:['Biaya audio: ','Audio cost: '],
+ engineNoSupport:['\ud83d\udd12 engine blm dukung','\ud83d\udd12 engine lacks support'],
+ dimMismatch:['\ud83d\udd12 gak cocok dimensi','\ud83d\udd12 dimension mismatch'],
+ minGameLock:['\ud83d\udd12 min. game ','\ud83d\udd12 min. game '],
+ tooBigScale:['\u26a0\ufe0f Skala game terlalu besar (maks ','\u26a0\ufe0f Game scale too large (max '],
+ licFree:['Gratis','Free'],
+ licOnce:['Sekali ','One-time '], licRoyal:['Royalti ','Royalty '], perMonth:['/bln','/mo'],
+ pubCutLbl:['potong ','cut '], pubReachLbl:[' \u00b7 jangkauan ',' \u00b7 reach '],
+ platCutLbl:[' \u00b7 potongan ',' \u00b7 cut '],
+ scoreMid:[' \u00b7 skor ',' \u00b7 score '], storyRichTag:[' \u00b7 \ud83d\udcd6 kaya cerita',' \u00b7 \ud83d\udcd6 story-rich'],
+ yourGamesLbl:['Game Anda','Your Games'],
+ copiesLbl:[' salinan',' copies'],
+ copiesSoldCap:['SALINAN TERJUAL','COPIES SOLD'], revenueCap:['PENDAPATAN','REVENUE'],
+ nowTagPar:[' (saat ini)',' (current)'],
+ buildBtn:['Bangun','Build'],
+ srvBuildStart:['\ud83c\udfd7\ufe0f Pembangunan server dimulai!','\ud83c\udfd7\ufe0f Server construction started!'],
+ payLbl:['Bayar','Pay'],
+ engineBasicNm:['Engine Dasar','Basic Engine'],
+ engineBasicDesc:['Kode sendiri dari nol. Gratis, tapi cuma kuat buat game kecil.','Coded from scratch by you. Free, but only strong enough for small games.'],
+ acceptClose:['Terima Penutupan','Accept Shutdown'], rejectClose:['Tolak Penutupan','Reject Shutdown'],
+ proposeClose:['Ajukan','Propose'], cancelBtn2:['Batal','Cancel'],
+ newSubToast:['\ud83c\udf0d Ada developer ngajuin game buat diterbitkan!','\ud83c\udf0d A developer submitted a game for you to publish!'],
+ rivalRelA1:[' rilis "',' released "'], rivalRelA2:['" \u2014 game bergenre ','" \u2014 a '],
+ rivalRelA3:[', mirip rilisan ',' game, much like the recent release from '], rivalRelA4:['! Persaingan makin ketat.','! Competition is heating up.'],
+ rivalRelB1:[' rilis game baru "',' released a new game "'], rivalRelB2:['" \u2014 genre ','" \u2014 genre '],
+ remakeOk:['\ud83d\udd04 Remake sukses!','\ud83d\udd04 Remake success!'],
+ remakeBad:['\ud83d\udd04 Remake mengecewakan','\ud83d\udd04 Disappointing remake'],
+ remakeSame:['\ud83d\udd04 Remake setara aslinya','\ud83d\udd04 Remake on par with the original'],
+ seriesStoryHope:['\ud83d\ude10 Fans berharap kelanjutan cerita','\ud83d\ude10 Fans hoped for a story continuation'],
+ seriesWelcome:['\ud83c\udfac Seri baru diterima baik','\ud83c\udfac New series well received'],
+ seqStoryHappy:['\ud83d\udcd6 Fans cerita puas!','\ud83d\udcd6 Story fans are satisfied!'],
+ seqWeakStory:['\ud83d\ude15 Induk minim cerita \u2014 Seri lebih cocok','\ud83d\ude15 Parent game is light on story \u2014 a Series fits better'],
+ dlcMakeTitle:['\ud83d\udce6 Buat DLC \u2014 ','\ud83d\udce6 Make DLC \u2014 '],
+ bidangDevDesc:['Membuka wizard Buat Game: topik, genre, platform, review, penjualan.','Unlocks the Make Game wizard: topics, genres, platforms, reviews, sales.'],
+ ambGenreFb:['aksi','action'], ambPlatFb:['toko digital','digital store'],
+ defStoreNm:['Toko-Ku','My Store'], defCompanyNm:['Studio Kita','Our Studio'], defPlayerNm:['Kamu','You'],
+ spbAmatir:['Amatir','Amateur'], spbDasar:['Dasar','Basic'], spbLokal:['Lokal','Local'], spbLuas:['Luas','Wide'],
+ spbPubKecil:['Publisher Kecil','Small Publisher'], spbBesar:['Besar','Large'],
+ spbPubMenengah:['Publisher Menengah','Mid Publisher'], spbPubTerkenal:['Publisher Terkenal','Renowned Publisher'],
+ spbGlobal:['Global','Global'],
+ unitK:['rb','K'], newGameDlc:['📦 Game Baru + DLC','📦 New Game + DLC'],
+ awardWon1:[' menang ',' won '], awardWon2:[' lewat "',' with "'],
+ awardsAnnounced:[' telah diumumkan!',' have been announced!'],
 };
 function t(k){ const v=I18N[k]; if(!v) return k; return v[LANG==='en'?1:0]; }
 function mon(i){ return (LANG==='en'?BULAN_EN:BULAN)[i]; }
 function _bi(list,fields){ (list||[]).forEach(o=>{ if(!o) return; fields.forEach(f=>{ const en=o[f+'E']; if(en===undefined) return; const idv=o[f]; try{ Object.defineProperty(o,f,{get(){ return LANG==='en'?en:idv; },configurable:true}); }catch(e){} }); }); }
 function initBiData(){
-  _bi(GENRES,['nm']); _bi(TOPICS,['nm']); _bi(PLATFORMS,['desc']); _bi(ENGINES,['desc']);
+  _bi(GENRES,['nm']); _bi(TOPICS,['nm']); _bi(PLATFORMS,['desc']); _bi(ENGINES,['nm','desc']);
   _bi(SIZES,['nm']); _bi(STAGES,['nm','desc']); _bi(EVENTS,['tt','tx']); _bi(STORE_R,['nm']);
   _bi(PUBS,['nm','pro','con']); _bi(GRSTYLE,['nm']); _bi(AUDIOC,['nm']); _bi(MKT,['nm']);
   _bi(HOST,['nm','desc']); _bi(ENGFEAT,['nm']); _bi(MKT_TIERS,['nm']); _bi(UPD_TIERS,['nm']);
@@ -973,6 +1022,8 @@ function initBiData(){
 }
 function setLang(l){
   LANG=l;
+  try{ localStorage.setItem(LANG_KEY,l); }catch(e){}
+  try{ document.documentElement.setAttribute('lang',l); }catch(e){}
   if(S) S.lang=l;
   applyStaticI18n();
   if(typeof started!=='undefined'&&started){ try{ renderTop&&renderTop(); }catch(e){} }
@@ -1074,11 +1125,11 @@ const PLATFORMS=[
 
 
 const ENGINES=[
- {id:'pembuat',  nm:'PembuatGame',      ic:'🧰', from:1999, m:1.05, model:'once', fee:120, maxSize:1, neverFeat:['25d','3d'], yrOffset:6, desc:'Engine 2D ramah pemula (ala GameMaker/Construct). Cocok game kecil–sedang. Bayar sekali, pakai selamanya.',descE:'Beginner-friendly 2D engine (GameMaker/Construct-style). Great for small–mid games. Pay once, use forever.'},
- {id:'dodot',    nm:'Dodot',            ic:'🤖', from:2014, m:1.08, model:'free', fee:0,   maxSize:2, neverFeat:[], yrOffset:2, desc:'Open source sejati (ala Godot). Gratis total, mampu bikin game sampai kelas besar.',descE:'True open source (Godot-style). Totally free, handles up to large games.'},
- {id:'persatuan',nm:'Persatuan Engine', ic:'🎯', from:2005, m:1.10, model:'cut',  fee:.04, maxSize:2, neverFeat:[], yrOffset:0, desc:'Favorit indie & mobile (ala Unity). Gratis + potongan 4%, mampu sampai game besar.',descE:'Indie & mobile favorite (Unity-style). Free + a 4% cut, handles up to large games.'},
- {id:'sumber',   nm:'Sumber Engine',    ic:'🧪', from:2004, m:1.15, model:'bln',  fee:20,  maxSize:3, neverFeat:[], yrOffset:-2, desc:'Engine studio kelas AAA (ala Source). Sewa bulanan, tapi sanggup proyek raksasa.',descE:'AAA-class studio engine (Source-style). Monthly rental, but handles giant projects.'},
- {id:'nyata',    nm:'Nyata Engine',     ic:'💎', from:1998, m:1.20, model:'cut',  fee:.05, maxSize:3, neverFeat:[], yrOffset:-4, desc:'Engine grafis kelas atas (ala Unreal). Gratis dipakai, royalti 5%, sanggup game AAA.',descE:'Top-tier graphics engine (Unreal-style). Free to use, 5% royalty, AAA-capable.'}
+ {id:'pembuat',  nm:'PembuatGame', nmE:'GameForge',     ic:'🧰', from:1999, m:1.05, model:'once', fee:120, maxSize:1, neverFeat:['25d','3d'], yrOffset:6, desc:'Engine 2D ramah pemula (ala GameMaker/Construct). Cocok game kecil–sedang. Bayar sekali, pakai selamanya.',descE:'Beginner-friendly 2D engine (GameMaker/Construct-style). Great for small–mid games. Pay once, use forever.'},
+ {id:'dodot',    nm:'Dodot', nmE:'Godoh',            ic:'🤖', from:2014, m:1.08, model:'free', fee:0,   maxSize:2, neverFeat:[], yrOffset:2, desc:'Open source sejati (ala Godot). Gratis total, mampu bikin game sampai kelas besar.',descE:'True open source (Godot-style). Totally free, handles up to large games.'},
+ {id:'persatuan',nm:'Persatuan Engine', nmE:'Unison Engine', ic:'🎯', from:2005, m:1.10, model:'cut',  fee:.04, maxSize:2, neverFeat:[], yrOffset:0, desc:'Favorit indie & mobile (ala Unity). Gratis + potongan 4%, mampu sampai game besar.',descE:'Indie & mobile favorite (Unity-style). Free + a 4% cut, handles up to large games.'},
+ {id:'sumber',   nm:'Sumber Engine', nmE:'Sourcery Engine',    ic:'🧪', from:2004, m:1.15, model:'bln',  fee:20,  maxSize:3, neverFeat:[], yrOffset:-2, desc:'Engine studio kelas AAA (ala Source). Sewa bulanan, tapi sanggup proyek raksasa.',descE:'AAA-class studio engine (Source-style). Monthly rental, but handles giant projects.'},
+ {id:'nyata',    nm:'Nyata Engine', nmE:'Unrealm Engine',     ic:'💎', from:1998, m:1.20, model:'cut',  fee:.05, maxSize:3, neverFeat:[], yrOffset:-4, desc:'Engine grafis kelas atas (ala Unreal). Gratis dipakai, royalti 5%, sanggup game AAA.',descE:'Top-tier graphics engine (Unreal-style). Free to use, 5% royalty, AAA-capable.'}
 ];
 const SIZES=[
  {id:'kecil', nm:'Kecil', nmE:'Small',  days:30,  cost:40,   div:1,    cap:1,   pf:.6, stage:0},
@@ -1104,7 +1155,7 @@ const EVENTS=[
  {y:1996,m:8, tt:'📺 Otari 2600 Rilis!', tx:'Konsol rumahan pertama yang populer. Pasar game rumahan terbuka lebar.', ttE:'📺 Otari 2600 Launches!',txE:'The first popular home console. The home gaming market is wide open.', fx:{}},
  {y:1997,m:5, tt:'👾 Invasi Alien Ruang!', tx:'Game tembak alien jadi fenomena dunia. Era emas arkade dimulai!', ttE:'👾 Space Alien Invasion!',txE:'An alien shooter becomes a worldwide phenomenon. The golden age of arcades begins!', fx:{trend:{k:'t',id:'luarangkasa',dur:2}}},
  {y:1998,m:4, tt:'🟡 Pak-Man Melahap Dunia', tx:'Karakter kuning pemakan titik menguasai arkade di mana-mana.', ttE:'🟡 Pak-Man Devours the World',txE:'The dot-munching yellow character takes over arcades everywhere.', fx:{trend:{k:'t',id:'labirin',dur:2}}},
- {y:2000,m:6, tt:'📉 KRISIS INDUSTRI 1983!', tx:'Pasar game Amerika runtuh! Terlalu banyak game jelek membanjiri pasar. Penjualan anjlok drastis…', ttE:'📉 THE 1983 INDUSTRY CRASH!',txE:'The American game market collapses! Too many bad games flooded the shelves. Sales plummet…', fx:{mk:{v:.35,dur:2}}},
+ {y:2000,m:6, tt:'📉 KRISIS INDUSTRI GAME!', tx:'Pasar game Amerika runtuh! Terlalu banyak game jelek membanjiri pasar. Penjualan anjlok drastis…', ttE:'📉 THE GREAT INDUSTRY CRASH!',txE:'The American game market collapses! Too many bad games flooded the shelves. Sales plummet…', fx:{mk:{v:.35,dur:2}}},
  {y:2001,m:9, tt:'🎮 FamiTron Menyelamatkan Industri!', tx:'Konsol 8-bit dari Jepang membangkitkan kembali pasar game. Penjualan pulih!', ttE:'🎮 FamiTron Saves the Industry!',txE:'An 8-bit console from Japan revives the game market. Sales recover!', fx:{mk:{v:1.25,dur:2}}},
  {y:2003,m:3, tt:'📟 GameSaku: Main di Mana Saja', tx:'Konsol genggam pertama yang sukses besar. Game portabel jadi tren.', ttE:'📟 GameSaku: Play Anywhere',txE:'The first massively successful handheld. Portable gaming becomes a trend.', fx:{}},
  {y:2005,m:7, tt:'⚔️ Perang Konsol 16-bit', tx:'Dua raksasa konsol saling serang iklan. Gamer diuntungkan, pasar memanas!', ttE:'⚔️ The 16-bit Console War',txE:'Two console giants trade attack ads. Gamers win, and the market heats up!', fx:{mk:{v:1.15,dur:2}}},
@@ -1132,11 +1183,11 @@ const STORE_R=[
 const PUBS=[
  {id:'none',  nm:'🚀 Rilis Mandiri', nmE:'🚀 Self-Publish',  cut:0,   boost:1,   from:1987,to:2026, excl:[],
    pro:'Semua pendapatan buatmu sendiri.',proE:'All the revenue is yours.', con:'Jangkauan pasar cuma sebatas nama studiomu.',conE:'Market reach is only as big as your studio\'s name.'},
- {id:'kotak', nm:'📦 Kotak Games',     cut:.35, boost:1.3, from:1997,to:2008, excl:['ponsel','gs4','hybrid','gs5','xkotak','gs2'],
-   pro:'Jago di era arkade & konsol 8/16-bit klasik.',proE:'Great in the arcade & classic 8/16-bit console era.', con:'Gulung tikar sebelum era 3D — cuma ada sampai 1996.',conE:'Folded before the 3D era — only around until 1996.'},
- {id:'awan',  nm:'☁️ Awan Interaktif',  cut:.40, boost:1.5, from:2006,to:2016, excl:['ponsel'],
-   pro:'Kuat banget di era konsol 3D/5-6 gen.',proE:'Very strong in the 3D / gen 5–6 console era.', con:'Kalah saing pas booming mobile, tutup 2009.',conE:'Lost out during the mobile boom, shut down in 2009.'},
- {id:'indie', nm:'🤝 Kumpul Indie',    cut:.30, boost:1.35,from:2009,to:2026, excl:[],
+ {id:'kotak', nm:'📦 Kotak Games', nmE:'📦 Boxed Games', cut:.35, boost:1.3, from:1997,to:2008, excl:['ponsel','gs4','hybrid','gs5','xkotak','gs2'],
+   pro:'Jago di era arkade & konsol 8/16-bit klasik.',proE:'Great in the arcade & classic 8/16-bit console era.', con:'Gulung tikar sebelum era HD — cuma ada sampai 2008.',conE:'Folds before the HD era — only around until 2008.'},
+ {id:'awan',  nm:'☁️ Awan Interaktif', nmE:'☁️ Cloud Interactive', cut:.40, boost:1.5, from:2006,to:2016, excl:['ponsel'],
+   pro:'Kuat banget di era konsol 3D/5-6 gen.',proE:'Very strong in the 3D / gen 5–6 console era.', con:'Kalah saing pas booming mobile, tutup 2016.',conE:'Loses out during the mobile boom, shuts down in 2016.'},
+ {id:'indie', nm:'🤝 Kumpul Indie', nmE:'🤝 Indie Collective', cut:.30, boost:1.35,from:2009,to:2026, excl:[],
    pro:'Ramah developer kecil, potongan wajar, rilis di platform mana pun.',proE:'Small-dev friendly, fair cut, publish on any platform.', con:'Promosinya biasa aja, jangkauan sedang.',conE:'Promotion is just okay, mid-tier reach.'},
  {id:'garuda',nm:'🦅 Garuda Interactive',cut:.32,boost:1.6, from:2016,to:2026, excl:['mainframe','arkade','otari','famitron','gamesaku','sfami','gstation','gs2','xkotak'],
    pro:'Raja publisher mobile & PC modern, jangkauan luas di Asia.',proE:'King of modern mobile & PC publishing, wide reach across Asia.', con:'Cuma mau handle platform modern — gak nyentuh konsol jadul.',conE:'Only handles modern platforms — won\'t touch retro consoles.'},
@@ -1369,8 +1420,8 @@ function rivalTick(){
     const lastGame=S.games.length?S.games[S.games.length-1]:null;
     const genreArr=lastGame?(Array.isArray(lastGame.gn)?lastGame.gn:[lastGame.gn]):[];
     const clash=g && genreArr.includes(g.id);
-    if(clash) pushNews('⚔️ '+r.nm+' rilis "'+title+'" — game bergenre '+gn+', mirip rilisan '+S.companyNm+'! Persaingan makin ketat.');
-    else pushNews('🏢 '+r.nm+' rilis game baru "'+title+'" — genre '+gn+'.');
+    if(clash) pushNews('⚔️ '+r.nm+t('rivalRelA1')+title+t('rivalRelA2')+gn+t('rivalRelA3')+S.companyNm+t('rivalRelA4'));
+    else pushNews('🏢 '+r.nm+t('rivalRelB1')+title+t('rivalRelB2')+gn+'.');
   }
 }
 const AWARD_CATS=[
@@ -1418,14 +1469,14 @@ function runAwards(){
     } else {
       const r=S.rivals&&S.rivals.length?pick(S.rivals):{nm:pick(RIVAL_POOL)};
       const title=rivalTitle();
-      pushNews(cat.ic+' '+r.nm+' menang '+cat.nm+' lewat "'+title+'"!');
+      pushNews(cat.ic+' '+r.nm+t('awardWon1')+cat.nm+t('awardWon2')+title+'"!');
     }
   }
   if(won.length){
     S.trophies=S.trophies||{};
     S.trophies[S.y]=won;
   }
-  toast('🏆 Game Awards '+S.y+' telah diumumkan!'); sfx('fanfare');
+  toast('🏆 Game Awards '+S.y+t('awardsAnnounced')); sfx('fanfare');
 }
 function nextAwardDate(){
   if(S.y<2010) return {y:2010,mo:11,day:24};
@@ -1459,8 +1510,8 @@ const ACHIEVEMENTS=[
  {id:'firstonline',ic:'🌐',nm:'Terhubung',nmE:'Connected',desc:'Rilis game online pertamamu',descE:'Release your first online game',chk:s=>s.games.some(g=>g.online)},
  {id:'firsttrophy',ic:'🏆',nm:'Juara',nmE:'Champion',desc:'Menangkan trophy Game Awards pertamamu',descE:'Win your first Game Awards trophy',chk:s=>Object.keys(s.trophies||{}).length>=1},
  {id:'firstgoty',ic:'👑',nm:'Yang Terbaik',nmE:'The Very Best',desc:'Menangkan Game of the Year',descE:'Win Game of the Year',chk:s=>Object.values(s.trophies||{}).some(yr=>yr.some(w=>w.catId==='goty'))},
- {id:'remakesukses',ic:'🔄',nm:'Kebangkitan',nmE:'Revival',desc:'Bikin remake yang sukses besar',descE:'Make a hugely successful remake',chk:s=>s.games.some(g=>g._relTag&&g._relTag.includes('Remake sukses')) },
- {id:'maxstage',ic:'🏙️',nm:'Puncak Karier',nmE:'Career Peak',desc:'Studio naik ke tingkat tertinggi ('+STAGES[STAGES.length-1].nm+')',descE:'Studio reaches the top tier (Company)',chk:s=>s.stage>=STAGES.length-1},
+ {id:'remakesukses',ic:'🔄',nm:'Kebangkitan',nmE:'Revival',desc:'Bikin remake yang sukses besar',descE:'Make a hugely successful remake',chk:s=>s.games.some(g=>g._relKey==='remakeOk'||(g._relTag&&(g._relTag.includes('Remake sukses')||g._relTag.includes('Remake success')))) },
+ {id:'maxstage',ic:'🏙️',nm:'Puncak Karier',nmE:'Career Peak',desc:'Studio naik ke tingkat tertinggi (Perusahaan)',descE:'Studio reaches the top tier (Company)',chk:s=>s.stage>=STAGES.length-1},
  {id:'engowner',ic:'🔧',nm:'Pencipta Engine',nmE:'Engine Creator',desc:'Punya engine buatan sendiri',descE:'Own a self-built engine',chk:s=>!!s.myEng},
  {id:'storeopen',ic:'🏪',nm:'Pemilik Toko',nmE:'Store Owner',desc:'Buka toko game sendiri',descE:'Open your own game store',chk:s=>!!(s.store&&s.store.open)},
  {id:'multiplat5',ic:'🕹️',nm:'Serba Ada',nmE:'Everywhere at Once',desc:'Rilis 1 game di 5+ platform sekaligus',descE:'Release 1 game on 5+ platforms at once',chk:s=>s.games.some(g=>g.plsD&&g.plsD.length>=5)},
@@ -1482,7 +1533,7 @@ const EXT_ENGINES=['Voidforge Engine','Copperlight Engine','Marrowtech Engine','
 const MKT_TIERS=[
  {id:'kecil',nm:'Kecil',nmE:'Small',ic:'📣',cost:5000,boost:0.15},
  {id:'sedang',nm:'Sedang',nmE:'Medium',ic:'📢',cost:25000,boost:0.35},
- {id:'besar',nm:'Besar',ic:'📡',cost:80000,boost:0.65}
+ {id:'besar',nm:'Besar',nmE:'Large',ic:'📡',cost:80000,boost:0.65}
 ];
 function genPubSubmission(){
   const tp=pick(TOPICS.filter(t=>t.yr<=S.y));
@@ -1517,7 +1568,7 @@ function pubTick(){
   if(S.pubSubs.length<3 && Math.random()<0.02){
     S.pubSubs.push(genPubSubmission());
     S.pubSubUnread=true;
-    toastAction('🌍 Ada developer ngajuin game buat diterbitkan!',null,viewPublishing);
+    toastAction(t('newSubToast'),null,viewPublishing);
   }
 }
 function openPublishing(){
@@ -1639,8 +1690,8 @@ function showServerCloseCard(gid,who){
     '<p style="font-size:13px;line-height:1.5;margin:0 0 10px">'+msg+'</p>'+
     (barsH?'<p style="font-size:10.5px;color:var(--mut);margin:0 0 4px">'+t('profit4wkLbl')+'</p>'+barsH:'')+
     '<div style="display:flex;gap:8px;margin-top:14px">'+
-      '<button class="btn pri" style="flex:1" onclick="serverCloseAccept('+gid+',\''+who+'\')">'+(who==='dev'?'Terima Penutupan':'Ajukan')+'</button>'+
-      '<button class="btn ghost" style="flex:1" onclick="serverCloseReject('+gid+',\''+who+'\')">'+(who==='dev'?'Tolak Penutupan':'Batal')+'</button>'+
+      '<button class="btn pri" style="flex:1" onclick="serverCloseAccept('+gid+',\''+who+'\')">'+(who==='dev'?t('acceptClose'):t('proposeClose'))+'</button>'+
+      '<button class="btn ghost" style="flex:1" onclick="serverCloseReject('+gid+',\''+who+'\')">'+(who==='dev'?t('rejectClose'):t('cancelBtn2'))+'</button>'+
     '</div></div>';
   document.body.appendChild(el);
 }
@@ -1690,8 +1741,8 @@ function pubPlayerCloseResolve(gid){
 function ambName(){ return pick(AMB_STUDIO); }
 function ambEv(){ return pick(AMB_EVNAME); }
 function ambMeme(){ return pick(AMB_MEME); }
-function ambGenre(){ const g=pick(GENRES.filter(x=>x.yr<=S.y)); return g?g.nm:'aksi'; }
-function ambPlat(){ const p=pick(getPlats()); return p?p.nm:'toko digital'; }
+function ambGenre(){ const g=pick(GENRES.filter(x=>x.yr<=S.y)); return g?g.nm:t('ambGenreFb'); }
+function ambPlat(){ const p=pick(getPlats()); return p?p.nm:t('ambPlatFb'); }
 const AMB_NEWS=[
  ()=>LANG==='en'?'🗣️ '+ambName()+' is rumored to be working on a massive '+ambGenre()+' game, expected to launch next year.':'🗣️ '+ambName()+' dikabarkan lagi garap game '+ambGenre()+' besar-besaran, rilis diperkirakan tahun depan.',
  ()=>LANG==='en'?'🗣️ Internal leaks say '+ambName()+' is experimenting with new tech for their next game.':'🗣️ Bocoran internal nyebut '+ambName()+' lagi eksperimen sama teknologi baru buat game mereka.',
@@ -1798,6 +1849,8 @@ const MKT=[
  {nm:'Iklan Besar', nmE:'Big Ads',   c:4000, m:2.0}
 ];
 const NAMA_STAF=['Budi','Sari','Agus','Dewi','Rizky','Putri','Joko','Maya','Andi','Lina','Fajar','Nina','Tono','Rina','Bayu','Citra','Eko','Wati','Hadi','Mega','Dimas','Ayu','Gilang','Tika'];
+const NAMA_STAF_EN=['Alex','Mia','Noah','Ivy','Leo','Zara','Owen','Nora','Kai','Elena','Felix','Iris','Dane','Rosa','Milo','Cleo','Emil','Wren','Hugo','Maren','Dexter','Ada','Gil','Tess'];
+function staffNamePool(){ return LANG==='en'?NAMA_STAF_EN:NAMA_STAF; }
 const REVIEWERS=['Info Gamer','Bintang Game','Piksel Play','Mega Zine'];
 const KOMEN={
  hi:['Mahakarya! Wajib main!','Tidak bisa berhenti main, keterlaluan serunya!','Calon game of the year, gak nyangka!','Sempurna di semua sisi, gak ada cela!',
@@ -1905,14 +1958,14 @@ function newState(){
     grafisU:['2d1'], styleU:['lowpix'], audioCU:['nosfx','noback','noost','bip'], audioTU:['mono'], featU:[],
     car:{dev:true}, carMain:'dev',
     offers:[], subs:[],
-    store:{open:false,nm:'Toko-Ku',users:0,devs:0,tax:0,lic:'free',once:25,bln:3,res:[],lastP:0}, stoInc:0,
+    store:{open:false,nm:t('defStoreNm'),users:0,devs:0,tax:0,lic:'free',once:25,bln:3,res:[],lastP:0}, stoInc:0,
     myEng:null, engOwn:[], engPub:{model:'pri',users:0,bln:3,once:25,lastP:0}, engInc:0, pubOff:null, dead:false, engBuild:null,
     ownSrv:{status:'none',d:0,days:60},
     proj:null, contract:null, offer:null, train:null, cands:[],
     trend:null, mk:null, sales:[], news:[], wkHist:[], wkAccum:0,
     best:0, loanUsed:false, muted:false, speed:1, seq:0, pendingRel:[], pendingDlc:[], saveDay:true,
-    flags:{}, ended:false, endless:false, done:[], totalEarn:0, lang:'id', newsUnread:false,
-    ambMonths:null, ambDone:[], ambYr:null, rivals:null, companyNm:'Studio Kita', playerNm:'Kamu',
+    flags:{}, ended:false, endless:false, done:[], totalEarn:0, lang:LANG, newsUnread:false,
+    ambMonths:null, ambDone:[], ambYr:null, rivals:null, companyNm:t('defCompanyNm'), playerNm:t('defPlayerNm'),
     awardDay:null, awardDayYr:null, awardsDone:[], trophies:{}, ach:[], achUnread:false, pubGames:[],
     pubUnlocked:false, pubSubs:[], pendingPub:[], pubTestDone:false, pubSubUnread:false, lbCo:null, tutSeen:{}, showFps:true, comboHist:{}, techNotifQueue:[]
   };
@@ -1932,7 +1985,7 @@ function wipeSave(){ try{ localStorage.removeItem(slotKey(activeSlot)); }catch(e
 function migrate(sv){
   const s=Object.assign(newState(),sv);
   if(!sv.rivals){ const _S=S; S=s; initRivals(); S=_S; }
-  if(s.lang) LANG=s.lang;
+  if(s.lang&&s.lang!==LANG){ LANG=s.lang; try{ localStorage.setItem(LANG_KEY,LANG); }catch(e){} try{ document.documentElement.setAttribute('lang',LANG); }catch(e){} try{ applyStaticI18n(); }catch(e){} }
   if(!sv.tpU) s.tpU=TOPICS.filter(t=>t.yr<=s.y).map(t=>t.id);
   if(!sv.gnU){
     s.gnU=GENRES.filter(g=>g.yr<=s.y&&!g.need).map(g=>g.id);
@@ -2044,7 +2097,7 @@ function unlockFeat(id){
   toast(t('learnFeat')+f.nm+'!'); sfx('fanfare'); save(); openRiset(); renderTop();
 }
 function getEngines(){
-  const a=[{id:'dasar',nm:'Engine Dasar',ic:'🔧',m:1,model:'free',fee:0,maxSize:0,desc:'Kode sendiri dari nol. Gratis, tapi cuma kuat buat game kecil.'}];
+  const a=[{id:'dasar',nm:t('engineBasicNm'),ic:'🔧',m:1,model:'free',fee:0,maxSize:0,desc:t('engineBasicDesc')}];
   for(const e of ENGINES) if(e.from<=S.y) a.push(e);
   if(S.myEng) a.push({id:'own',nm:S.myEng.nm+t('ownEngTag'),ic:'🔧',m:1,model:'free',fee:0,maxSize:Math.min(3,Math.floor(S.myEng.lvl/3)),desc:LANG==='en'?'Your own engine, free to use. The more updates it gets, the bigger the games it can handle.':'Engine buatanmu sendiri, gratis dipakai. Makin sering di-update, makin kuat scale game yang bisa ditangani.'});
   return a;
@@ -2101,9 +2154,9 @@ function priceMult(price,sweet){
   return Math.pow(sweet/price,1.25);
 }
 function licTxt(pl){
-  if(pl.model==='free') return 'Gratis';
-  if(pl.model==='bln') return fmtM(pl.lic)+'/bln';
-  return 'Sekali '+fmtM(licOf(pl));
+  if(pl.model==='free') return t('licFree');
+  if(pl.model==='bln') return fmtM(pl.lic)+t('perMonth');
+  return t('licOnce')+fmtM(licOf(pl));
 }
 function monthlyBurn(){
   let b=STAGES[S.stage].rent;
@@ -2516,7 +2569,7 @@ function rollCands(){
   S.cands=[];
   for(let i=0;i<2;i++){
     const sk=ri(3,5)+Math.floor((S.y-1980)/8);
-    S.cands.push({nm:pick(NAMA_STAF), sk:Math.max(3,sk),
+    S.cands.push({nm:pick(staffNamePool()), sk:Math.max(3,sk),
       sal:Math.round((30+sk*22)*eraCost(S.y))});
   }
 }
@@ -2626,7 +2679,7 @@ function checkPendingRelease(){
     const g=S.games.find(x=>x.id===+gid); if(!g||g._reviewed) continue;
     g._reviewed=true;
     setPaused(true);
-    openReviewSheet(g,fgByGame[gid],g.units,g._combo,g._match,g._tm,g._relTag);
+    openReviewSheet(g,fgByGame[gid],g.units,g._combo,g._match,g._tm,g._relKey?t(g._relKey):g._relTag);
   }
   save(); renderAll();
 }
@@ -2675,15 +2728,15 @@ function lowRatingSalesAdj(u,rev,pmult){
   return out;
 }
 function selfPubBoost(fans){
-  if(fans<=100) return {b:1.0, lbl:'Amatir'};
-  if(fans<=500) return {b:1.05, lbl:'Dasar'};
-  if(fans<=1490) return {b:1.15, lbl:'Lokal'};
-  if(fans<=10000) return {b:1.3, lbl:'Luas'};
-  if(fans<=99000) return {b:1.5, lbl:'Publisher Kecil'};
-  if(fans<=499000) return {b:1.7, lbl:'Besar'};
-  if(fans<=1490000) return {b:1.9, lbl:'Publisher Menengah'};
-  if(fans<=9990000) return {b:2.1, lbl:'Publisher Terkenal'};
-  return {b:2.4, lbl:'Global'};
+  if(fans<=100) return {b:1.0, lbl:t('spbAmatir')};
+  if(fans<=500) return {b:1.05, lbl:t('spbDasar')};
+  if(fans<=1490) return {b:1.15, lbl:t('spbLokal')};
+  if(fans<=10000) return {b:1.3, lbl:t('spbLuas')};
+  if(fans<=99000) return {b:1.5, lbl:t('spbPubKecil')};
+  if(fans<=499000) return {b:1.7, lbl:t('spbBesar')};
+  if(fans<=1490000) return {b:1.9, lbl:t('spbPubMenengah')};
+  if(fans<=9990000) return {b:2.1, lbl:t('spbPubTerkenal')};
+  return {b:2.4, lbl:t('spbGlobal')};
 }
 function pubBoostNow(pubId){ return pubId==='none'?selfPubBoost(S.fans).b:(PUBS.find(x=>x.id===pubId)||PUBS[0]).boost; }
 let WD=null;
@@ -2778,7 +2831,7 @@ function renderDlcMaker(){
   h+='</div>';
   h+='<div class="wizNav"><div class="wizBtnRow"><button class="btn ghost" onclick="WD=null;renderAll()">'+t('dlcCancelBtn')+'</button>'+
     '<button class="btn pri" onclick="confirmDlcMake()">'+t('dlcMakeBtn')+'</button></div></div>';
-  openSheet('📦 Buat DLC — '+esc(base.nm), '<div class="wizScroll"><div class="wizStage">'+h+'</div></div>', false, 'wiz');
+  openSheet(t('dlcMakeTitle')+esc(base.nm), '<div class="wizScroll"><div class="wizStage">'+h+'</div></div>', false, 'wiz');
   if(document.querySelector('.wheelCol')) initWheelsDlc();
   setTimeout(updateScrollThumb,20);
 }
@@ -2875,22 +2928,24 @@ function finishProject(){
   const combo=rc.tema.net>=0?1.1:0.9; // dipakai buat badge (kombo bagus/aneh), bukan penentu rating lagi
   const match=1-rc.slider.malus/6; // seberapa pas fokus slider vs profil tema (0-1), buat referensi
   // Efek sekuel / prekuel / seri
-  let relM=1, relTag='';
+  let relM=1, relTag='', relKey='';
   const parentRef=p.par!=null?S.games.find(g=>g.id===p.par):null;
   if(p.rel==='remake'&&parentRef){
     relM=remakeMult(parentRef.rev, rev);
-    relTag = relM>1.001?'🔄 Remake sukses!':(relM<0.999?'🔄 Remake mengecewakan':'🔄 Remake setara aslinya');
+    relKey = relM>1.001?'remakeOk':(relM<0.999?'remakeBad':'remakeSame'); relTag=t(relKey);
     parentRef.remade=true;
   } else if(p.rel&&p.rel!=='baru'&&parentRef){
     const par=parentRef;
     relM=1+clamp((par.rev-5)/(p.rel==='seri'?10:8), p.rel==='seri'?-0.2:-0.35, p.rel==='seri'?0.35:0.5);
     const story=(par.st||0)>=6;
     if(p.rel==='seri'){
-      if(story){ relM-=0.08; relTag='😐 Fans berharap kelanjutan cerita'; }
-      else relTag='🎬 Seri baru diterima baik';
+      if(story){ relM-=0.08; relKey='seriesStoryHope'; }
+      else relKey='seriesWelcome';
+      relTag=t(relKey);
     } else {
-      if(story){ relM+=0.15; relTag='📖 Fans cerita puas!'; }
-      else{ relM-=0.10; relTag='😕 Induk minim cerita — Seri lebih cocok'; }
+      if(story){ relM+=0.15; relKey='seqStoryHappy'; }
+      else{ relM-=0.10; relKey='seqWeakStory'; }
+      relTag=t(relKey);
     }
     if(p.rel==='sekuel'||p.rel==='prekuel') par.branched=true;
   }
@@ -2937,7 +2992,7 @@ function finishProject(){
     grafis:p.grafis||null,style:p.style||[],audioC:p.audioC||[],audioT:p.audioT||null,feat:p.feat||[],
     cost:p.cost||0, gross, net:total, mtEarn:0, temaNet:rc.tema.net, audioNet:rc.audio.net,
     _qualMk:qualMk,_ovl:ovl,_engCut:engCut,_pbCut:PB.cut,pendingPlats:schedP.map(s=>({id:s.id,price:s.price,y:s.relY,mo:s.relM,day:s.relD})),
-    _combo:combo,_match:match,_tm:tm,_relTag:relTag,_reviewed:false};
+    _combo:combo,_match:match,_tm:tm,_relTag:relTag,_relKey:relKey,_reviewed:false};
   if(g.online){
     g.players=Math.max(5,Math.round(units*0.3));
     g.lastUY=S.y; g.lastUM=S.mo; g.closed=false; g.lastInc=0; g.ver=1;
@@ -3115,13 +3170,13 @@ function openEngPricing(){
   h+='<div class="card white" style="'+(ep.model==='sekali'?'border:2px solid #4ade80':'')+'"><h4 style="cursor:pointer" onclick="engSetModel(\'sekali\')">'+(LANG==='en'?'💰 Pay Once':'💰 Bayar Sekali')+(ep.model==='sekali'?' ✅':'')+'</h4>'+
     '<div style="display:flex;justify-content:space-between;font-size:12px;font-weight:800"><span>'+t('hargaLbl2')+'<span id="engOnceV" style="color:var(--pri)">'+fmtM(onceV)+'</span></span><span style="color:var(--mut)">'+(LANG==='en'?'suggested ≈ ':'rekomendasi ≈ ')+fmtM(rec.once)+'</span></div>'+
     '<input type="range" min="1" max="2000" step="5" value="'+onceV+'" id="engOnceSld" oninput="engPriceSlide(\'once\',this.value)">'+
-    '<div style="display:flex;align-items:center;gap:8px;margin-top:6px"><span style="font-size:12px;font-weight:800">Rp</span>'+
+    '<div style="display:flex;align-items:center;gap:8px;margin-top:6px">'+
     '<input type="number" inputmode="numeric" min="1" value="'+onceV+'" id="engOnceNum" style="flex:1" oninput="engPriceType(\'once\',this.value)"><span style="font-size:11px;color:var(--mut)">'+(LANG==='en'?'K/license':'rb/lisensi')+'</span></div>'+
     '<button class="btn pri" style="margin-top:8px" onclick="engSetModel(\'sekali\')">'+t('pickPayOnce')+'</button></div>';
   h+='<div class="card white" style="'+(ep.model==='bln'?'border:2px solid #4ade80':'')+'"><h4 style="cursor:pointer" onclick="engSetModel(\'bln\')">📅 Subscription'+(ep.model==='bln'?' ✅':'')+'</h4>'+
     '<div style="display:flex;justify-content:space-between;font-size:12px;font-weight:800"><span>'+t('hargaLbl2')+'<span id="engBlnV" style="color:var(--pri)">'+fmtM(blnV)+'</span></span><span style="color:var(--mut)">'+(LANG==='en'?'suggested ≈ ':'rekomendasi ≈ ')+fmtM(rec.bln)+'</span></div>'+
     '<input type="range" min="1" max="500" step="1" value="'+blnV+'" id="engBlnSld" oninput="engPriceSlide(\'bln\',this.value)">'+
-    '<div style="display:flex;align-items:center;gap:8px;margin-top:6px"><span style="font-size:12px;font-weight:800">Rp</span>'+
+    '<div style="display:flex;align-items:center;gap:8px;margin-top:6px">'+
     '<input type="number" inputmode="numeric" min="1" value="'+blnV+'" id="engBlnNum" style="flex:1" oninput="engPriceType(\'bln\',this.value)"><span style="font-size:11px;color:var(--mut)">'+(LANG==='en'?'K/mo':'rb/bln')+'</span></div>'+
     '<button class="btn pri" style="margin-top:8px" onclick="engSetModel(\'bln\')">'+t('pickSubs')+'</button></div>';
   h+='<button class="btn ghost" style="margin-top:8px" onclick="openEngineMenu()">'+t('backBtn')+'</button>';
@@ -3166,16 +3221,16 @@ function showReqInfo(cardEl,which){
   let lines='';
   if(which==='eng'){
     lines='<div class="rowline"><span>Release</span><span>'+releasedN+'/2 games '+(releasedN>=2?'✅':'❌')+'</span></div>'+
-      '<div class="rowline"><span>Bayar</span><span>'+fmtM(S.money)+'/1.4jt '+(S.money>=1400?'✅':'❌')+'</span></div>'+
+      '<div class="rowline"><span>'+t('payLbl')+'</span><span>'+fmtM(S.money)+'/'+fmtM(1400)+' '+(S.money>=1400?'✅':'❌')+'</span></div>'+
       '<div class="rowline"><span>RP</span><span>'+S.rp+'/50RP '+(S.rp>=50?'✅':'❌')+'</span></div>';
   } else if(which==='sto'){
     const hasSrv=S.ownSrv&&S.ownSrv.status==='ready';
-    lines='<div class="rowline"><span>Fans</span><span>'+fmtN(S.fans)+'/10rb '+(S.fans>=10000?'✅':'❌')+'</span></div>'+
-      '<div class="rowline"><span>Bayar</span><span>'+fmtM(S.money)+'/10jt '+(S.money>=10000?'✅':'❌')+'</span></div>'+
+    lines='<div class="rowline"><span>Fans</span><span>'+fmtN(S.fans)+'/'+fmtN(10000)+' '+(S.fans>=10000?'✅':'❌')+'</span></div>'+
+      '<div class="rowline"><span>'+t('payLbl')+'</span><span>'+fmtM(S.money)+'/'+fmtM(10000)+' '+(S.money>=10000?'✅':'❌')+'</span></div>'+
       '<div class="rowline"><span>'+t('haveOwnSrv')+'</span><span>'+(hasSrv?'✅':'❌')+'</span></div>';
   } else if(which==='pub'){
-    lines='<div class="rowline"><span>Fans</span><span>'+fmtN(S.fans)+'/1jt '+(S.fans>=1000000?'✅':'❌')+'</span></div>'+
-      '<div class="rowline"><span>Bayar</span><span>'+fmtM(S.money)+'/2jt '+(S.money>=2000?'✅':'❌')+'</span></div>';
+    lines='<div class="rowline"><span>Fans</span><span>'+fmtN(S.fans)+'/'+fmtN(1000000)+' '+(S.fans>=1000000?'✅':'❌')+'</span></div>'+
+      '<div class="rowline"><span>'+t('payLbl')+'</span><span>'+fmtM(S.money)+'/'+fmtM(2000)+' '+(S.money>=2000?'✅':'❌')+'</span></div>';
   }
   const rect=cardEl.getBoundingClientRect();
   const el=document.createElement('div');
@@ -3207,7 +3262,7 @@ function openStoreNameCard(){
     '<p class="wlbl" style="text-align:left">'+t('storeNameLbl')+'</p>'+
     '<div class="namerow"><input type="text" id="stNewNm" maxlength="24" placeholder="'+t('storeNamePh')+'" oninput="stNameCheck()"></div>'+
     '<div style="display:flex;gap:8px;margin-top:14px">'+
-      '<button class="btn ghost" style="flex:1" onclick="closeStoreNameCard()">'+t('cancelBtn2')+'</button>'+
+      '<button class="btn ghost" style="flex:1" onclick="itutTryClose(\'closeStoreNameCard\')">'+t('cancelBtn2')+'</button>'+
       '<button class="btn pri" id="stNameBtn" style="flex:1" disabled onclick="confirmStoreUnlock()">'+t('createNowBtn')+'</button>'+
     '</div></div>';
   document.body.appendChild(el);
@@ -3412,7 +3467,7 @@ function openStorePkg(){
     h+='<div class="card white" style="'+(unlocked?'':'opacity:.5')+'"><h3 style="text-align:center;font-size:18px">'+t('pkgTitle')+p.nm+(unlocked?'':' 🔒')+'</h3>';
     if(unlocked){
       const lines=[];
-      for(const sz in p.free) lines.push(t('freeLbl2')+fmtN(Math.round((st.games[sz]||0)*p.free[sz]))+t('gameScaleLbl')+sz);
+      for(const sz in p.free) lines.push(t('freeLbl2')+fmtN(Math.round((st.games[sz]||0)*p.free[sz]))+t('freeScaleLbl')+sz);
       for(const sz in p.disc) lines.push(t('discLbl2')+Math.round(p.disc[sz]*100)+'% '+sz.replace(/^./,c=>c.toUpperCase())+' game');
       h+='<p style="font-size:11px">'+lines.join('<br>')+'</p>'+
         '<div style="display:flex;justify-content:space-between;font-size:12px;font-weight:800;margin-top:8px"><span>'+t('harga2')+' <span id="stPkg'+p.id+'V" style="color:var(--pri)">'+fmtM(pd.price||rec)+'</span></span><span style="color:var(--mut)">'+t('recApprox')+fmtM(rec)+'</span></div>'+
@@ -3519,7 +3574,7 @@ function openProjectMenu(){
 }
 function openEngineUnlock(){
   itutSignal('openEngineUnlock');
-  let h='<div class="card white"><h4>'+t('engUnlockTitle')+'</h4><p>'+t('engUnlockMsg')+'<br><br>'+t('costLbl')+' <b>1.4jt + 50RP</b></p></div>'+
+  let h='<div class="card white"><h4>'+t('engUnlockTitle')+'</h4><p>'+t('engUnlockMsg')+'<br><br>'+t('costLbl')+' <b>'+fmtM(1400)+' + 50RP</b></p></div>'+
     '<button class="btn pri" onclick="openEngineNameCard()">'+t('makeEngineBtn')+'</button>'+
     '<button class="btn ghost" style="margin-top:8px" onclick="openProjectMenu()">'+t('backBtn')+'</button>';
   openSheet(t('engDevTitle'),h,false,'compact');
@@ -3534,7 +3589,7 @@ function openEngineNameCard(){
     '<p class="wlbl" style="text-align:left">'+t('engineNameLbl')+'</p>'+
     '<div class="namerow"><input type="text" id="engNewNm" maxlength="24" placeholder="'+t('engineNamePh')+'" oninput="engNameCheck()"></div>'+
     '<div style="display:flex;gap:8px;margin-top:14px">'+
-      '<button class="btn ghost" style="flex:1" onclick="closeEngineNameCard()">'+t('cancelBtn2')+'</button>'+
+      '<button class="btn ghost" style="flex:1" onclick="itutTryClose(\'closeEngineNameCard\')">'+t('cancelBtn2')+'</button>'+
       '<button class="btn pri" id="engNameBtn" style="flex:1" disabled onclick="confirmEngineUnlock()">'+t('createNowBtn')+'</button>'+
     '</div></div>';
   document.body.appendChild(el);
@@ -3593,7 +3648,7 @@ function openPublishMenu(){
   const unlocked=S.fans>=1000000&&S.money>=2000;
   const subN=(S.pubSubs||[]).length;
   let h='<div class="catgrid">'+
-    '<div class="catcard c1" onclick="setHist(\'devgame\',\'publish\')"><div class="ic">📋</div><div class="lb">Game Anda</div>'+(devN?'<div class="note">'+devN+'</div>':'')+'</div>'+
+    '<div class="catcard c1" onclick="setHist(\'devgame\',\'publish\')"><div class="ic">📋</div><div class="lb">'+t('yourGamesLbl')+'</div>'+(devN?'<div class="note">'+devN+'</div>':'')+'</div>'+
     '<div class="catcard c2" '+(unlocked?'onclick="openPublishing()"':'onpointerenter="showReqInfo(this,\'pub\')" onpointerleave="hideReqInfo()"')+' style="position:relative;'+(unlocked?'':'opacity:.5')+'"><div class="ic">🌍</div><div class="lb">Game Publishing</div>'+(S.pubSubUnread&&subN?'<div class="dot num on">'+subN+'</div>':'')+'</div>'+
     '</div>'+
     '<button class="btn ghost" style="margin-top:8px" onclick="openProjectMenu()">'+t('backBtn')+'</button>';
@@ -3693,7 +3748,7 @@ function chipRow(list,cur,fn,ownArr,costFn,ulFn){
 }
 const SZORDER=['kecil','sedang','besar','aaa'];
 function sizeIdx(id){ return SZORDER.indexOf(id); }
-function wProg(step){ return '<div class="bar" style="margin-bottom:10px"><div class="fill" style="width:'+Math.round((step+1)/(W.nSteps||14)*100)+'%"></div></div><p style="font-size:10.5px;color:#f8fafc;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.4);margin:0 0 8px">Fase '+(step+1)+'/'+(W.nSteps||14)+'</p>'; }
+function wProg(step){ return '<div class="bar" style="margin-bottom:10px"><div class="fill" style="width:'+Math.round((step+1)/(W.nSteps||14)*100)+'%"></div></div><p style="font-size:10.5px;color:#f8fafc;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.4);margin:0 0 8px">'+t('wizPhase')+(step+1)+'/'+(W.nSteps||14)+'</p>'; }
 function costLine(){
   const c=wCost();
   const dc=calcProjDays();
@@ -3766,7 +3821,7 @@ function wizBody(){
         h+='<p class="wlbl">'+t('pickParentLbl')+'</p><div class="scrollbox">';
         for(const g of elig){
           h+='<div class="rowline" style="cursor:pointer" onclick="wPar('+g.id+')"><div><b>'+esc(g.nm)+'</b>'+
-            '<div style="font-size:10px;color:var(--mut)">'+g.gn+' · '+g.y+' · skor '+fmtRev(g.rev)+((g.st||0)>=6?' · 📖 kaya cerita':'')+'</div></div>'+
+            '<div style="font-size:10px;color:var(--mut)">'+g.gn+' · '+g.y+t('scoreMid')+fmtRev(g.rev)+((g.st||0)>=6?t('storyRichTag'):'')+'</div></div>'+
             (W.par===g.id?'<span class="tag ok">✓</span>':'')+'</div>';
         }
         h+='</div>';
@@ -3791,9 +3846,9 @@ function wizBody(){
     return h;
   }
   if(W.step===2){
-    let h='<h2 style="font-size:15px;margin:0 0 8px">Nama game:</h2><div class="namerow"><input type="text" id="wNm" maxlength="28" value="'+esc(W.nm)+'" placeholder="Nama game…" oninput="W.nm=this.value"></div>';
+    let h='<h2 style="font-size:15px;margin:0 0 8px">'+t('gameNameLbl')+'</h2><div class="namerow"><input type="text" id="wNm" maxlength="28" value="'+esc(W.nm)+'" placeholder="'+t('gameNamePh')+'" oninput="W.nm=this.value"></div>';
     if(W.rel==='baru'){
-      h+='<div class="rowline" style="margin-top:10px;cursor:pointer" onclick="wToggleDLC()"><span>📦 New Game + DLC</span><button class="toggleSw'+(W.withDLC?' on':'')+'"><span class="knob"></span></button></div>';
+      h+='<div class="rowline" style="margin-top:10px;cursor:pointer" onclick="wToggleDLC()"><span>'+t('newGameDlc')+'</span><button class="toggleSw'+(W.withDLC?' on':'')+'"><span class="knob"></span></button></div>';
       if(W.withDLC){
         if(!W.dlcNm) W.dlcNm=(W.nm||'Game')+':DLC Version';
         h+='<p class="wlbl">'+t('dlcNameLbl')+'</p><div class="namerow"><input type="text" maxlength="28" value="'+esc(W.dlcNm)+'" oninput="W.dlcNm=this.value"></div>';
@@ -3824,12 +3879,12 @@ function wizBody(){
     for(const e of engs){
       const on=W.engPicked&&W.eng===e.id;
       const insufficient=e.maxSize<sIdx;
-      const fee=e.model==='free'?'Gratis':e.model==='cut'?('Royalti '+Math.round(e.fee*100)+'%'):
-        e.model==='bln'?(fmtM(e.fee)+'/bln'):('Sekali '+fmtM(e.fee)+(S.engOwn.includes(e.id)?' · ✓':''));
+      const fee=e.model==='free'?t('licFree'):e.model==='cut'?(t('licRoyal')+Math.round(e.fee*100)+'%'):
+        e.model==='bln'?(fmtM(e.fee)+t('perMonth')):(t('licOnce')+fmtM(e.fee)+(S.engOwn.includes(e.id)?' · ✓':''));
       if(insufficient){
         const msg=(t('tooBig1')+e.nm+t('maksLbl')+szRange(e.maxSize)+')').replace(/'/g,"");
         h+='<div class="pickcard danger" onclick="toast(\''+msg+'\',\'warn\')"><div><b>'+e.ic+' '+e.nm+'</b> <span class="tag">×'+e.m.toFixed(2)+'</span>'+
-          '<div style="font-size:10px;color:#ef4444;font-weight:700">⚠️ Skala game terlalu besar (maks '+szRange(e.maxSize)+')</div></div></div>';
+          '<div style="font-size:10px;color:#ef4444;font-weight:700">'+t('tooBigScale')+szRange(e.maxSize)+')</div></div></div>';
       } else {
         const neverNames=(e.neverFeat||[]).map(fid=>{const nf=ENGFEAT.find(x=>x.id===fid);return nf?nf.nm:fid;}).join(', ');
         h+='<div class="pickcard'+(on?' on':'')+'" onclick="wPickEng(\''+e.id+'\')"><div><b>'+e.ic+' '+e.nm+'</b> <span class="tag'+(on?' ok':'')+'">'+(on?'✓ ':'')+'×'+e.m.toFixed(2)+'</span>'+
@@ -3847,8 +3902,8 @@ function wizBody(){
     const modeW=chipUniformWidth(['📴 Offline','🌐 Online','🌍 MMO']);
     let h='<p class="wlbl">'+t('gameModeLbl')+'</p><div class="chips">'+
       '<div class="chip'+(W.mode==='offline'?' on':'')+'" style="width:'+modeW+'px;text-align:center" onclick="wMode(\'offline\')">📴 Offline</div>'+
-      '<div class="chip'+(W.mode==='online'?' on':'')+(canOnline?'':' lock')+'" style="width:'+modeW+'px;text-align:center" '+(canOnline?'onclick="wMode(\'online\')"':'')+'>🌐 Online'+(canOnline?'':' <span class="hint">🔒 engine blm dukung</span>')+'</div>'+
-      '<div class="chip'+(W.mode==='mmo'?' on':'')+(canOnline?'':' lock')+'" style="width:'+modeW+'px;text-align:center" '+(canOnline?'onclick="wMode(\'mmo\')"':'')+'>🌍 MMO'+(canOnline?'':' <span class="hint">🔒 engine blm dukung</span>')+'</div></div>';
+      '<div class="chip'+(W.mode==='online'?' on':'')+(canOnline?'':' lock')+'" style="width:'+modeW+'px;text-align:center" '+(canOnline?'onclick="wMode(\'online\')"':'')+'>🌐 Online'+(canOnline?'':' <span class="hint">'+t('engineNoSupport')+'</span>')+'</div>'+
+      '<div class="chip'+(W.mode==='mmo'?' on':'')+(canOnline?'':' lock')+'" style="width:'+modeW+'px;text-align:center" '+(canOnline?'onclick="wMode(\'mmo\')"':'')+'>🌍 MMO'+(canOnline?'':' <span class="hint">'+t('engineNoSupport')+'</span>')+'</div></div>';
 
     if(W.mode!=='offline'){
       h+='<div class="scrollbox"><div class="chips">';
@@ -3858,7 +3913,7 @@ function wizBody(){
         const locked=lockedMmo||lockedOwn;
         const on=W.host===hst.id;
         h+='<div class="chip'+(on?' on':'')+(locked?' lock':'')+'" '+(locked?'':'onclick="wSet(\'host\',\''+hst.id+'\')"')+'>'+hst.ic+' '+hst.nm+
-          ' <span class="hint">'+(lockedOwn?t('buildFirst'):lockedMmo?t('minOwnSrv'):(hst.bln?fmtM(hst.bln)+'/bln':t('freeStar')))+'</span></div>';
+          ' <span class="hint">'+(lockedOwn?t('buildFirst'):lockedMmo?t('minOwnSrv'):(hst.bln?fmtM(hst.bln)+t('perMonth'):t('freeStar')))+'</span></div>';
       }
       h+='</div>';
       if(S.ownSrv.status==='building'){
@@ -3880,7 +3935,7 @@ function wizBody(){
       const on=W.grafis===g.id;
       const engOk=techEngOk('grafis',g.id,W.eng);
       h+='<div class="chip'+(on?' on':'')+(engOk?'':' lock')+'" '+(engOk?'onclick="wSet(\'grafis\',\''+g.id+'\')"':'')+'>'+g.nm+
-        (engOk?' <span class="hint">'+(g.cost?fmtM(g.cost):'gratis')+'</span>':' <span class="hint">'+t('engLock')+'</span>')+'</div>';
+        (engOk?' <span class="hint">'+(g.cost?fmtM(g.cost):t('freeLbl'))+'</span>':' <span class="hint">'+t('engLock')+'</span>')+'</div>';
     }
     h+='</div>';
     const gg=GRAFIS.find(x=>x.id===W.grafis);
@@ -3903,14 +3958,14 @@ function wizBody(){
       const on=W.style.includes(st.id);
       const canPick=compatible&&minOk&&engOk;
       h+='<div class="chip'+(on?' on':'')+(canPick?'':' lock')+'" style="width:'+stW+'px;text-align:center" '+(canPick?'onclick="wStyleTog(\''+st.id+'\')"':'')+'>'+st.ic+' '+st.nm+
-        (!compatible?' <span class="hint">🔒 gak cocok dimensi</span>':(!engOk?' <span class="hint">'+t('engLock')+'</span>':(!minOk?' <span class="hint">🔒 min. game '+st.minSize+'</span>':' <span class="hint">'+fmtM(st.cost)+'</span>')))+
+        (!compatible?' <span class="hint">'+t('dimMismatch')+'</span>':(!engOk?' <span class="hint">'+t('engLock')+'</span>':(!minOk?' <span class="hint">'+t('minGameLock')+st.minSize+'</span>':' <span class="hint">'+fmtM(st.cost)+'</span>')))+
         (st.comboWith?' <span class="hint">+combo</span>':'')+'</div>';
     }
     h+='</div>';
     if(!dim) h+='<div class="card"><p>'+t('pickDimFirst')+'</p></div>';
     if(W.style.length){
       const cst=W.style.reduce((a,id)=>a+((GRSTYLE.find(x=>x.id===id)||{}).cost||0),0);
-      h+='<div class="card"><p>Biaya style: <b>'+fmtM(cst)+'</b></p></div>';
+      h+='<div class="card"><p>'+t('styleCostLbl')+'<b>'+fmtM(cst)+'</b></p></div>';
     }
     h+='<div class="wizNav"><div class="wizCostWrap">'+costLine()+'</div><div class="wizBtnRow"><button class="btn ghost" onclick="W.step=6;renderWizard(\'back\')">'+t('backBtn')+'</button>'+
       '<button class="btn pri" '+(W.style.length?'':'disabled')+' onclick="W.step=8;renderWizard(\'next\')">'+t('nextBtn')+'</button></div></div>';
@@ -3921,7 +3976,7 @@ function wizBody(){
     const hasBack=W.audioC.some(id=>{const a=AUDIOC.find(x=>x.id===id);return a&&a.grp==='back';});
     const hasOst=W.audioC.some(id=>{const a=AUDIOC.find(x=>x.id===id);return a&&a.grp==='ost';});
     const hasType=!!W.audioT;
-    const CATS=[['sfx','SFX',hasSfx],['back','Backsound',hasBack],['ost','Soundtrack',hasOst],['type','Jenis Audio',hasType]];
+    const CATS=[['sfx','SFX',hasSfx],['back','Backsound',hasBack],['ost','Soundtrack',hasOst],['type',t('audioTypeCat'),hasType]];
     let h='<p class="wlbl">'+t('audioSetLbl')+'</p><div class="platGrid">';
     const catW=chipUniformWidth(CATS.map(c=>c[1]));
     // Baris tab tetap statis di atas (gaya leaderboard) -- gak ikut geser pas salah satu dibuka detailnya
@@ -3943,7 +3998,7 @@ function wizBody(){
         h+='<div class="chips">';
         for(const a of list){
           const on2=W.audioC.includes(a.id);
-          h+='<div class="chip'+(on2?' on':'')+'" style="width:'+w+'px;text-align:center" onclick="wAudioTog(\''+a.id+'\')">'+a.nm+' <span class="hint">'+(a.cost?fmtM(a.cost):'gratis')+'</span></div>';
+          h+='<div class="chip'+(on2?' on':'')+'" style="width:'+w+'px;text-align:center" onclick="wAudioTog(\''+a.id+'\')">'+a.nm+' <span class="hint">'+(a.cost?fmtM(a.cost):t('freeLbl'))+'</span></div>';
         }
         h+='</div>';
       } else if(key==='back'){
@@ -3952,7 +4007,7 @@ function wizBody(){
         h+='<div class="chips">';
         for(const a of list){
           const on2=W.audioC.includes(a.id);
-          h+='<div class="chip'+(on2?' on':'')+'" style="width:'+w+'px;text-align:center" onclick="wAudioRadio(\'back\',\''+a.id+'\')">'+a.nm+' <span class="hint">'+(a.cost?fmtM(a.cost):'gratis')+'</span></div>';
+          h+='<div class="chip'+(on2?' on':'')+'" style="width:'+w+'px;text-align:center" onclick="wAudioRadio(\'back\',\''+a.id+'\')">'+a.nm+' <span class="hint">'+(a.cost?fmtM(a.cost):t('freeLbl'))+'</span></div>';
         }
         h+='</div>';
       } else if(key==='ost'){
@@ -3962,7 +4017,7 @@ function wizBody(){
         for(const a of list){
           const on2=W.audioC.includes(a.id);
           const engOk=techEngOk('audioC',a.id,W.eng);
-          h+='<div class="chip'+(on2?' on':'')+(engOk?'':' lock')+'" style="width:'+w+'px;text-align:center" '+(engOk?'onclick="wAudioRadio(\'ost\',\''+a.id+'\')"':'')+'>'+a.nm+(engOk?' <span class="hint">'+(a.cost?fmtM(a.cost):'gratis')+'</span>':' <span class="hint">'+t('engLock')+'</span>')+'</div>';
+          h+='<div class="chip'+(on2?' on':'')+(engOk?'':' lock')+'" style="width:'+w+'px;text-align:center" '+(engOk?'onclick="wAudioRadio(\'ost\',\''+a.id+'\')"':'')+'>'+a.nm+(engOk?' <span class="hint">'+(a.cost?fmtM(a.cost):t('freeLbl'))+'</span>':' <span class="hint">'+t('engLock')+'</span>')+'</div>';
         }
         h+='</div></div>';
       } else if(key==='type'){
@@ -3972,14 +4027,14 @@ function wizBody(){
         for(const a of list){
           const on2=W.audioT===a.id;
           const engOk=techEngOk('audioType',a.id,W.eng);
-          h+='<div class="chip'+(on2?' on':'')+(engOk?'':' lock')+'" style="width:'+w+'px;text-align:center" '+(engOk?'onclick="wSet(\'audioT\',\''+a.id+'\')"':'')+'>'+a.nm+(engOk?' <span class="hint">'+(a.cost?fmtM(a.cost):'gratis')+'</span>':' <span class="hint">'+t('engLock')+'</span>')+'</div>';
+          h+='<div class="chip'+(on2?' on':'')+(engOk?'':' lock')+'" style="width:'+w+'px;text-align:center" '+(engOk?'onclick="wSet(\'audioT\',\''+a.id+'\')"':'')+'>'+a.nm+(engOk?' <span class="hint">'+(a.cost?fmtM(a.cost):t('freeLbl'))+'</span>':' <span class="hint">'+t('engLock')+'</span>')+'</div>';
         }
         h+='</div>';
       }
       h+='</div>';
     }
     const cAudio=W.audioC.reduce((s,id)=>s+((AUDIOC.find(x=>x.id===id)||{}).cost||0),0)+((AUDIOTYPE.find(x=>x.id===W.audioT)||{}).cost||0);
-    if(cAudio) h+='<div class="card"><p>Biaya audio: <b>'+fmtM(cAudio)+'</b></p></div>';
+    if(cAudio) h+='<div class="card"><p>'+t('audioCostLbl')+'<b>'+fmtM(cAudio)+'</b></p></div>';
     const okAudio=hasSfx&&hasBack&&hasOst&&W.audioT;
     h+='<div class="wizNav"><div class="wizCostWrap">'+costLine()+'</div><div class="wizBtnRow"><button class="btn ghost" onclick="W.step=7;renderWizard(\'back\')">'+t('backBtn')+'</button>'+
       '<button class="btn pri" '+(okAudio?'':'disabled')+' onclick="W.step=9;renderWizard(\'next\')">'+t('nextBtn')+'</button></div></div>';
@@ -4023,7 +4078,7 @@ function wizBody(){
   if(W.step===11){
     let h='<p class="wlbl">'+t('pickAds')+'</p><div class="chips">';
     MKT.forEach((m,i)=>{ h+='<div class="chip'+(W.mkt===i?' on':'')+'" onclick="wSet(\'mkt\','+i+')">'+m.nm+
-      ' <span class="hint">'+(m.c?fmtM(Math.round(m.c*eraCost(S.y))):'gratis')+'</span></div>'; });
+      ' <span class="hint">'+(m.c?fmtM(Math.round(m.c*eraCost(S.y))):t('freeLbl'))+'</span></div>'; });
     h+='</div>'+'<div class="wizNav"><div class="wizCostWrap">'+costLine()+'</div><div class="wizBtnRow"><button class="btn ghost" onclick="W.step=10;renderWizard(\'back\')">'+t('backBtn')+'</button>'+
       '<button class="btn pri" onclick="W.step=12;renderWizard(\'next\')">'+t('nextBtn')+'</button></div></div>';
     return h;
@@ -4071,7 +4126,7 @@ function wizBody(){
     const boostNow=pb.id==='none'?selfPubBoost(S.fans):null;
     const boostTxt=boostNow?boostNow.lbl+' ×'+boostNow.b:'×'+pb.boost;
     h+='<div class="card white" style="cursor:pointer;'+(on?'border-color:var(--pri);background:var(--pri-soft)':'')+'" onclick="wSet(\'pub\',\''+pb.id+'\')"><h4>'+pb.nm+(on?' <span class="tag ok">✓</span>':'')+
-      ' <span class="tag">'+(pb.cut?'potong '+Math.round(pb.cut*100)+'%':'0%')+' · jangkauan '+boostTxt+'</span></h4>'+
+      ' <span class="tag">'+(pb.cut?t('pubCutLbl')+Math.round(pb.cut*100)+'%':'0%')+t('pubReachLbl')+boostTxt+'</span></h4>'+
       '<p>👍 '+pb.pro+'<br>👎 '+pb.con+'</p></div>';
   }
   h+='</div>';
@@ -4219,13 +4274,13 @@ function platCardHtml(i,s,p){
   const rec=recPrice(wCost());
   const cap=platCapacity(p,S.y);
   let h='<div class="platCard"><button class="minbtn" onclick="wMinimizePl()">━</button>'+
-    '<h4 style="margin:0 26px 8px 0">'+p.nm+' <span class="tag">'+licTxt(p)+((p.cut||0)?' · potongan '+Math.round(p.cut*100)+'%':'')+'</span></h4>'+
+    '<h4 style="margin:0 26px 8px 0">'+p.nm+' <span class="tag">'+licTxt(p)+((p.cut||0)?t('platCutLbl')+Math.round(p.cut*100)+'%':'')+'</span></h4>'+
     '<p style="font-size:11px;color:var(--mut);font-weight:700;margin:0 0 8px">💾 Storage '+fmtStorage(cap.st)+' · 🔩 Tech '+Math.round(cap.tc)+'</p>'+
     '<div style="display:flex;justify-content:space-between;font-size:12px;font-weight:800"><span>'+t('hargaLbl2')+'<span id="pv'+i+'" style="color:var(--pri)">'+fmtPrice(s.price)+'</span></span><span style="color:var(--mut)">'+(LANG==='en'?'suggested ≈ ':'rekomendasi ≈ ')+fmtM(rec)+'</span></div>'+
     '<input type="range" min="0" max="2000" step="10" value="'+s.price+'" id="sld'+i+'" oninput="wPriceSlide('+i+',this.value)">'+
-    '<div style="display:flex;align-items:center;gap:8px;margin-top:6px"><span style="font-size:12px;font-weight:800">Rp</span>'+
+    '<div style="display:flex;align-items:center;gap:8px;margin-top:6px">'+
     '<input type="number" inputmode="numeric" min="0" max="2000" step="1" value="" placeholder="'+s.price+'" id="num'+i+'" style="flex:1" oninput="wPriceType('+i+',this.value)">'+
-    '<span style="font-size:11px;color:var(--mut)">rb</span></div>'+
+    '<span style="font-size:11px;color:var(--mut)">'+t('unitK')+'</span></div>'+
     (W.withDLC?(
       '<div style="display:flex;justify-content:space-between;font-size:12px;font-weight:800;margin-top:10px;color:var(--pri)"><span>'+t('dlcPriceL')+'<span id="dpv'+i+'">'+fmtPrice(s.dlcPrice!=null?s.dlcPrice:Math.round(rec*0.3))+'</span></span><span style="color:var(--mut);font-weight:600">'+(LANG==='en'?'suggested ≈ ':'rekomendasi ≈ ')+fmtM(Math.round(rec*0.3))+'</span></div>'+
       '<input type="range" min="0" max="2000" step="10" value="'+(s.dlcPrice||Math.round(rec*0.3))+'" oninput="wDlcPriceSlide('+i+',this.value)">'
@@ -4511,8 +4566,13 @@ function closeSheet(){
   if(started && !manualPause) setPaused(false);
   renderAll();
 }
-$('sheetX').onclick=closeSheet;
-$('backdrop').onclick=closeSheet;
+function itutTryClose(fnName){
+  if(ITUT) return; // during the interactive tutorial, dismiss/cancel buttons on floating cards are inert
+  const fn=window[fnName];
+  if(typeof fn==='function') fn.apply(null,Array.prototype.slice.call(arguments,1));
+}
+$('sheetX').onclick=function(){ itutTryClose('closeSheet'); };
+$('backdrop').onclick=function(){ itutTryClose('closeSheet'); };
 
 function setPaused(v){
   if(!S) return;
@@ -4532,7 +4592,7 @@ function showIdlePauseNotif(){
     'background:rgba(185,28,28,.97);color:#fff;font-size:12px;font-weight:800;padding:10px 16px;'+
     'border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.35);max-width:calc(100% - 32px);text-align:center;cursor:pointer';
   el.textContent=t('idlePaused');
-  el.onclick=()=>el.remove();
+  el.onclick=()=>{ if(ITUT) return; el.remove(); };
   document.body.appendChild(el);
 }
 function hideIdlePauseNotif(){
@@ -4868,14 +4928,14 @@ function resRow(r){
     '<button class="btn sm '+(okB?'pri':'ghost')+'" onclick="beliRiset(\''+r.id+'\')">'+r.rp+' RP + '+fmtM(r.cost)+'</button></div>';
 }
 const BIDANG=[
- ['dev','👨‍💻 Game Development','Membuka wizard Buat Game: topik, genre, platform, review, penjualan.',2000],
+ ['dev','👨‍💻 Game Development','bidangDevDesc',2000],
 ];
 function bangunServer(){
   const c=Math.round(10000*eraCost(S.y));
   if(S.ownSrv.status!=='none') return;
   if(!canAfford(25,c)) return;
   S.rp-=25; S.money-=c; S.ownSrv.status='building'; S.ownSrv.d=0;
-  toast('🏗️ Pembangunan server dimulai!'); sfx('click'); save(); renderWizard&&renderWizard(); openMarkas();
+  toast(t('srvBuildStart')); sfx('click'); save(); renderWizard&&renderWizard(); openMarkas();
 }
 function pubOfferCalc(g){
   const rev=g.rev!=null?g.rev:5;
@@ -4939,7 +4999,7 @@ function openMarkas(){
     openSheet('🏢 '+t('aMarkas'), h);
     return;
   }
-  const back='<div class="chips"><div class="chip" onclick="backMarkas()">← Kategori</div></div>';
+  const back='<div class="chips"><div class="chip" onclick="backMarkas()">'+t('backCategory')+'</div></div>';
   let h=back, title='🏢 '+t('aMarkas');
   if(curMarkas==='workplace'){
     const cur=STAGES[S.stage];
@@ -4955,7 +5015,7 @@ function openMarkas(){
       const c=Math.round(10000*eraCost(S.y));
       const okB=S.rp>=25&&S.money>=c;
       h+='<div class="card white"><h4>'+t('buildSrvT')+'</h4><p>'+t('buildSrvMsg')+'</p>'+
-        '<div style="margin-top:8px"><button class="btn sm '+(okB?'pri':'ghost')+'" onclick="bangunServer()">Bangun — 25 RP + '+fmtM(c)+'</button></div></div>';
+        '<div style="margin-top:8px"><button class="btn sm '+(okB?'pri':'ghost')+'" onclick="bangunServer()">'+t('buildBtn')+' — 25 RP + '+fmtM(c)+'</button></div></div>';
     } else if(S.ownSrv.status==='building'){
       h+='<div class="card"><h4>'+t('buildingT2')+'</h4><p>'+t('dayKe')+Math.min(S.ownSrv.days,Math.floor(S.ownSrv.d)+1)+'/'+S.ownSrv.days+'.</p></div>';
     } else {
@@ -5010,7 +5070,7 @@ function openHist(){
     list.forEach(g=>{
       const cls=g.rev>=7?'hi':(g.rev>=4.5?'mid':'lo');
       h+='<div class="rev-card" style="cursor:pointer" onclick="gameDetail('+g.id+')"><div><div class="who">'+esc(g.nm)+(g.online&&g.closed?' <span class="tag badc">📴</span>':'')+'</div>'+
-        '<div class="say">'+g.gn+' · '+g.pl+' · '+g.y+' — '+fmtN(g.units)+' salinan · '+fmtM(g.earn)+' ›</div></div>'+
+        '<div class="say">'+g.gn+' · '+g.pl+' · '+g.y+' — '+fmtN(g.units)+t('copiesLbl')+' · '+fmtM(g.earn)+' ›</div></div>'+
         '<div class="score '+cls+'">'+fmtRev(g.rev)+'</div></div>';
       if((curHist==='online'||curHist==='mmo')&&g.online&&!g.closed){
         if(g.pendingUpdate){
@@ -5041,7 +5101,7 @@ function openHist(){
     list.forEach(g=>{
       const cls=g.rev>=7?'hi':(g.rev>=4.5?'mid':'lo');
       h+='<div class="rev-card" style="cursor:pointer" onclick="gameDetail('+g.id+')"><div><div class="who">'+esc(g.nm)+'</div>'+
-        '<div class="say">'+t('dlcFromLbl')+'<b>'+esc(g.dlcOfNm||'?')+'</b> · '+g.y+' — '+fmtN(g.units)+' salinan · '+fmtM(g.earn)+' ›</div></div>'+
+        '<div class="say">'+t('dlcFromLbl')+'<b>'+esc(g.dlcOfNm||'?')+'</b> · '+g.y+' — '+fmtN(g.units)+t('copiesLbl')+' · '+fmtM(g.earn)+' ›</div></div>'+
         '<div class="score '+cls+'">'+fmtRev(g.rev)+'</div></div>';
     });
   } else if(curHist==='trophy'){
@@ -5085,7 +5145,7 @@ function openHist(){
     if(!list.length) h+='<div class="card"><p>'+t('noPubGameYet')+'</p></div>';
     list.forEach(g=>{
       h+='<div class="rev-card" style="cursor:pointer" onclick="gameDetail('+g.id+')"><div><div class="who">'+esc(g.nm)+(g.online&&g.closed?' <span class="tag badc">📴</span>':'')+'</div>'+
-        '<div class="say">'+t('devLbl3')+'<b>'+esc(g.devNm)+'</b> · '+g.gn+' · '+g.y+' — '+fmtN(g.units)+' salinan · '+fmtM(g.earn)+t('yourShareLbl')+Math.round(g.pubSharePct)+'%) ›</div></div></div>';
+        '<div class="say">'+t('devLbl3')+'<b>'+esc(g.devNm)+'</b> · '+g.gn+' · '+g.y+' — '+fmtN(g.units)+t('copiesLbl')+' · '+fmtM(g.earn)+t('yourShareLbl')+Math.round(g.pubSharePct)+'%) ›</div></div></div>';
     });
   }
   openSheet(title,h);
@@ -5148,7 +5208,7 @@ function renderDevUpdate(){
     const opts=GRAFIS.filter(x=>x.dim===curGraf.dim&&grafisVer(x.id)>=grafisVer(curGraf.id)&&x.yr<=S.y);
     if(opts.length>1){
       const sel=DU.newGrafis||curGraf.id;
-      h+='<div class="chips">'+opts.map(o=>'<div class="chip'+(sel===o.id?' on':'')+'" onclick="duPickGrafis(\''+o.id+'\')">'+o.nm+(o.id===curGraf.id?' (saat ini)':'')+'</div>').join('')+'</div>';
+      h+='<div class="chips">'+opts.map(o=>'<div class="chip'+(sel===o.id?' on':'')+'" onclick="duPickGrafis(\''+o.id+'\')">'+o.nm+(o.id===curGraf.id?t('nowTagPar'):'')+'</div>').join('')+'</div>';
     } else h+='<p style="font-size:10.5px;color:var(--mut)">'+t('noNewGrafisYet')+'</p>';
   }
   // Style
@@ -5275,7 +5335,7 @@ function releasePlatformNow(g,pp){
   fgE=Math.min(fgE,15000+S.fans*0.05);
   S.fans=Math.round(S.fans+fgE);
   sfx('fanfare');
-  if(!g._reviewed){ g._reviewed=true; setPaused(true); openReviewSheet(g,fgE,g.units,g._combo,g._match,g._tm,g._relTag); }
+  if(!g._reviewed){ g._reviewed=true; setPaused(true); openReviewSheet(g,fgE,g.units,g._combo,g._match,g._tm,g._relKey?t(g._relKey):g._relTag); }
 }
 function forceRelease(gid,idx){
   const g=S.games.find(x=>x.id===gid); if(!g) return;
@@ -5432,8 +5492,8 @@ function gameDetail(gid){
     h+='<p style="font-size:13px;color:var(--ink);font-weight:700;margin:6px 0 0">'+t('releaseYearLbl')+g.y+'</p>';
   }
   h+='<div class="statgrid">'+
-    '<div class="card"><div class="v">'+fmtN(g.units)+'</div><div class="k">SALINAN TERJUAL</div></div>'+
-    '<div class="card"><div class="v">'+fmtM(g.isPubGame?(g.gross||0):((g.earn||0)+(g.mtEarn||0)))+'</div><div class="k">PENDAPATAN'+(g.isPubGame?' TOTAL':'')+'</div></div></div>';
+    '<div class="card"><div class="v">'+fmtN(g.units)+'</div><div class="k">'+t('copiesSoldCap')+'</div></div>'+
+    '<div class="card"><div class="v">'+fmtM(g.isPubGame?(g.gross||0):((g.earn||0)+(g.mtEarn||0)))+'</div><div class="k">'+t('revenueCap')+(g.isPubGame?' TOTAL':'')+'</div></div></div>';
   if(g.grafis){
     const modeTag={online:'🌐 Online',mmo:'🌍 MMO'}[g.mode]||'';
     const ggf=GRAFIS.find(x=>x.id===g.grafis);
@@ -5469,7 +5529,7 @@ function gameDetail(gid){
   }
   if(g.plsD&&g.plsD.length){
     h+='<div class="card white"><h4>'+t('perPlatformTitle')+'</h4>';
-    for(const p of g.plsD) h+='<div class="rowline"><div><b>'+p.nm+'</b><div style="font-size:10px;color:var(--mut)">'+t('priceLbl')+fmtM(p.price)+'</div></div><span class="tag">'+fmtN(p.u)+' salinan</span></div>';
+    for(const p of g.plsD) h+='<div class="rowline"><div><b>'+p.nm+'</b><div style="font-size:10px;color:var(--mut)">'+t('priceLbl')+fmtM(p.price)+'</div></div><span class="tag">'+fmtN(p.u)+t('copiesLbl')+'</span></div>';
     h+='</div>';
   }
   if(g.pendingPlats&&g.pendingPlats.length){
@@ -6423,6 +6483,7 @@ function tryLockLandscape(){
   }catch(e){}
 }
 function boot(){
+  try{ document.documentElement.setAttribute('lang',LANG); }catch(e){}
   try{ drawLogo(); }catch(e){}
   try{ migrateLegacySave(); }catch(e){}
   activeSlot=loadActiveSlotIdx();
