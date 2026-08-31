@@ -539,7 +539,7 @@ input[type=number]{color:var(--ink);background:var(--card);border:1.5px solid va
         <button class="btn ghost" id="btnSlotPick" onclick="openSlotQuickPick()">Save 1</button>
       </div>
       <button class="iconbtn" id="btnTitleSet" onclick="openTitleSettings()" style="position:absolute;top:16px;right:16px;z-index:2" title="Settings">⚙️</button>
-      <div class="cred" id="credText">Dibuat oleh A Creep Games</div>
+      <div class="cred" id="credText">Dibuat oleh Nice Fox</div>
       <div class="cred" id="jsWarn" style="color:#fca5a5;margin-top:12px;max-width:320px;line-height:1.5">⚠️ Memuat skrip… / Loading… Jika pesan ini tidak hilang, JavaScript belum aktif di aplikasi ini — buka menu ⋮ → aktifkan JavaScript, atau buka file lewat <b>Chrome</b>.</div>
       <noscript><div class="cred" style="color:#fca5a5;margin-top:8px">JavaScript nonaktif — aktifkan untuk bermain. / JavaScript is disabled — enable it to play.</div></noscript>
     </div>
@@ -831,7 +831,7 @@ const I18N={
  pauseNote:[' · jeda',' · paused'],
  lanjut:['▶ Lanjutkan','▶ Continue'], baru:['✦ Petualangan Baru','✦ New Adventure'],
  sub1:['KISAH DEV INDIE · 1987 – 2026','AN INDIE DEV STORY · 1987 – 2026'],
- cred1:['Dibuat oleh A Creep Games','Made by A Creep Games'],
+ cred1:['Dibuat oleh Nice Fox','Made by Nice Fox'],
  privacyBtn:['🔒 Kebijakan Privasi','🔒 Privacy Policy'], privacyT:['🔒 Kebijakan Privasi','🔒 Privacy Policy'],
  backSettings:['← Pengaturan','← Settings'],
  overwriteT:['⚠️ Timpa Save Lama?','⚠️ Overwrite Old Save?'],
@@ -5680,14 +5680,14 @@ function openTitleSettings(){
       '<button class="btn sm '+(LANG==='id'?'pri':'ghost')+'" onclick="setLang(\'id\');openTitleSettings()">🇮🇩 ID</button>'+
       '<button class="btn sm '+(LANG==='en'?'pri':'ghost')+'" onclick="setLang(\'en\');openTitleSettings()">🇬🇧 EN</button></div></div>'+
     '<div style="display:flex;gap:8px;margin-top:12px">'+
-      '<button class="btn ghost" style="flex:1;text-align:center" onclick="openPrivacyPolicy()">'+t('privacyBtn')+'</button>'+
+      '<a href="https://ave-tech.github.io/PrivacyPolicy/Devsaga.html" target="_blank" rel="noopener" class="btn ghost" style="flex:1;text-align:center;text-decoration:none;display:block">'+t('privacyBtn')+'</a>'+
       '<a href="mailto:a.creep.games@gmail.com" class="btn ghost" style="flex:1;text-align:center;text-decoration:none">✉️ '+(LANG==='en'?'Contact Developer':'Hubungi Developer')+'</a>'+
     '</div>',false,'titlesheet');
 }
 function privacyPolicyHtml(){
   if(LANG==='en') return ''+
   '<div style="max-height:58vh;overflow-y:auto;font-size:12px;line-height:1.65;padding-right:4px">'+
-  '<p style="color:var(--mut);margin:0 0 10px">Effective date: July 2026 · App: <b>Dev Saga</b> · Developer: <b>A Creep Games</b></p>'+
+  '<p style="color:var(--mut);margin:0 0 10px">Effective date: July 2026 · App: <b>Dev Saga</b> · Developer: <b>Nice Fox</b></p>'+
   '<h4>1. Overview</h4>'+
   '<p>Dev Saga is a fully offline, single-player simulation game. This policy explains what data the game does and does not handle. The short version: <b>we do not collect, transmit, share, or sell any of your data.</b> Everything stays on your own device.</p>'+
   '<h4>2. Data We Do NOT Collect</h4>'+
@@ -5708,11 +5708,11 @@ function privacyPolicyHtml(){
   '<h4>8. Changes To This Policy</h4>'+
   '<p>If a future update ever changes how data is handled (for example, adding online features), this policy will be updated and the changes will be clearly communicated in the app and on the store listing before they take effect.</p>'+
   '<h4>9. Contact</h4>'+
-  '<p>For questions about this policy, email us at <b>a.creep.games@gmail.com</b>, or contact the developer (A Creep Games) through the app\u2019s store listing page.</p>'+
+  '<p>For questions about this policy, email us at <b>a.creep.games@gmail.com</b>, or contact the developer (Nice Fox) through the app\u2019s store listing page.</p>'+
   '</div>';
   return ''+
   '<div style="max-height:58vh;overflow-y:auto;font-size:12px;line-height:1.65;padding-right:4px">'+
-  '<p style="color:var(--mut);margin:0 0 10px">Berlaku sejak: Juli 2026 · Aplikasi: <b>Dev Saga</b> · Developer: <b>A Creep Games</b></p>'+
+  '<p style="color:var(--mut);margin:0 0 10px">Berlaku sejak: Juli 2026 · Aplikasi: <b>Dev Saga</b> · Developer: <b>Nice Fox</b></p>'+
   '<h4>1. Ringkasan</h4>'+
   '<p>Dev Saga adalah game simulasi single-player yang sepenuhnya offline. Kebijakan ini menjelaskan data apa yang ditangani dan tidak ditangani oleh game. Versi singkatnya: <b>kami tidak mengumpulkan, mengirim, membagikan, ataupun menjual data kamu sama sekali.</b> Semuanya tersimpan di perangkatmu sendiri.</p>'+
   '<h4>2. Data yang TIDAK Kami Kumpulkan</h4>'+
@@ -5733,7 +5733,7 @@ function privacyPolicyHtml(){
   '<h4>8. Perubahan Kebijakan</h4>'+
   '<p>Jika pembaruan di masa depan mengubah cara penanganan data (misalnya penambahan fitur online), kebijakan ini akan diperbarui dan perubahannya dikomunikasikan dengan jelas di dalam aplikasi serta di halaman toko sebelum berlaku.</p>'+
   '<h4>9. Kontak</h4>'+
-  '<p>Untuk pertanyaan seputar kebijakan ini, kirim email ke <b>a.creep.games@gmail.com</b>, atau hubungi developer (A Creep Games) melalui halaman toko aplikasi.</p>'+
+  '<p>Untuk pertanyaan seputar kebijakan ini, kirim email ke <b>a.creep.games@gmail.com</b>, atau hubungi developer (Nice Fox) melalui halaman toko aplikasi.</p>'+
   '</div>';
 }
 function openPrivacyPolicy(){
