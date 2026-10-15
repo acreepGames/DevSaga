@@ -396,6 +396,15 @@ input[type=number]{color:var(--ink);background:var(--card);border:1.5px solid va
 .title-screen .btn{max-width:220px;margin-bottom:7px;font-size:12.5px;padding:10px 13px}
 .title-screen .cred{color:#64748b;font-size:9px;margin-top:10px}
 .title-screen .iconbtn{width:28px;height:28px;font-size:13px}
+/* Notifikasi (toast) dari sisi kanan layar */
+.tsToast{position:absolute;right:14px;bottom:14px;z-index:3;width:200px;max-width:40vw;display:flex;gap:9px;align-items:flex-start;
+  background:var(--card);color:var(--ink);border:1px solid var(--line);border-left:3px solid var(--pri);border-radius:12px;
+  padding:10px 12px;font-size:10.5px;font-weight:700;line-height:1.45;box-shadow:0 10px 26px rgba(0,0,0,.45);
+  animation:toastIn .6s ease .5s both}
+.tsToast .tsIc{font-size:15px;line-height:1;margin-top:1px}
+.tsToast .tsTx{min-width:0}
+@keyframes toastIn{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.tsToast{animation:none}}
 .hide{display:none!important}
 .btn.dim{opacity:.35;pointer-events:none}
 
@@ -450,6 +459,7 @@ input[type=number]{color:var(--ink);background:var(--card);border:1.5px solid va
   .title-screen .sub{margin:1px 0 8px}
   .title-screen .btn{margin-bottom:5px;padding:8px 12px;font-size:11.5px}
   .title-screen .cred{margin-top:6px}
+  .tsToast{font-size:9px;padding:7px 9px;width:170px;right:10px;bottom:10px}
   #logoCv{width:min(46%,190px)}
   .bigscore .n{font-size:32px}
 }
@@ -532,17 +542,22 @@ input[type=number]{color:var(--ink);background:var(--card);border:1.5px solid va
     <div class="inner">
       <canvas id="logoCv" width="120" height="46"></canvas>
       <div class="sub">KISAH DEV INDIE · 1987 – 2026</div>
-      <button class="btn pri dim" id="btnLanjut" onclick="btnLanjutTap()">▶ Lanjutkan</button>
-      <button class="btn ghost" id="btnBaru" onclick="btnBaruTap()">✦ Petualangan Baru</button>
-      <div class="loadRow">
-        <button class="btn ghost" id="btnLoadMenu" onclick="openLoadMenu()">📂 Load Game</button>
-        <button class="btn ghost" id="btnSlotPick" onclick="openSlotQuickPick()">Save 1</button>
+      <div class="tsMain">
+        <div class="tsMenu">
+          <button class="btn pri dim" id="btnLanjut" onclick="btnLanjutTap()">▶ Lanjutkan</button>
+          <button class="btn ghost" id="btnBaru" onclick="btnBaruTap()">✦ Petualangan Baru</button>
+          <div class="loadRow">
+            <button class="btn ghost" id="btnLoadMenu" onclick="openLoadMenu()">📂 Load Game</button>
+            <button class="btn ghost" id="btnSlotPick" onclick="openSlotQuickPick()">Save 1</button>
+          </div>
+        </div>
       </div>
       <button class="iconbtn" id="btnTitleSet" onclick="openTitleSettings()" style="position:absolute;top:16px;right:16px;z-index:2" title="Settings">⚙️</button>
       <div class="cred" id="credText">Dibuat oleh Nice Fox</div>
       <div class="cred" id="jsWarn" style="color:#fca5a5;margin-top:12px;max-width:320px;line-height:1.5">⚠️ Memuat skrip… / Loading… Jika pesan ini tidak hilang, JavaScript belum aktif di aplikasi ini — buka menu ⋮ → aktifkan JavaScript, atau buka file lewat <b>Chrome</b>.</div>
       <noscript><div class="cred" style="color:#fca5a5;margin-top:8px">JavaScript nonaktif — aktifkan untuk bermain. / JavaScript is disabled — enable it to play.</div></noscript>
     </div>
+    <div class="tsToast" id="tsToast" role="status" aria-live="polite"><span class="tsIc" aria-hidden="true">🔔</span><span class="tsTx" id="tsNote">Game ini akan mendapat update besar pada 15 November 2026. Update-nya berupa tentang keuangan dalam game, sistem lainnya dan penambahan hal lainnya. Kalian bisa minta list update ke contact kami, akan kami jawab 100% tanpa pesan bot.</span></div>
   </div>
 </div>
 <script id="threeLib">/**
@@ -832,6 +847,7 @@ const I18N={
  lanjut:['▶ Lanjutkan','▶ Continue'], baru:['✦ Petualangan Baru','✦ New Adventure'],
  sub1:['KISAH DEV INDIE · 1987 – 2026','AN INDIE DEV STORY · 1987 – 2026'],
  cred1:['Dibuat oleh Nice Fox','Made by Nice Fox'],
+ tsNote:['Game ini akan mendapat update besar pada 15 November 2026. Update-nya berupa tentang keuangan dalam game, sistem lainnya dan penambahan hal lainnya. Kalian bisa minta list update ke contact kami, akan kami jawab 100% tanpa pesan bot.','This game will get a major update on November 15, 2026. The update covers in-game finances, other systems, and other additions. You can request the update list by contacting us, and we will answer 100% without bot messages.'],
  privacyBtn:['🔒 Kebijakan Privasi','🔒 Privacy Policy'], privacyT:['🔒 Kebijakan Privasi','🔒 Privacy Policy'],
  backSettings:['← Pengaturan','← Settings'],
  overwriteT:['⚠️ Timpa Save Lama?','⚠️ Overwrite Old Save?'],
@@ -1038,6 +1054,7 @@ function applyStaticI18n(){
   const bl=$('btnLanjut'); if(bl) bl.innerHTML=t('lanjut');
   const blm=$('btnLoadMenu'); if(blm) blm.innerHTML=t('loadGameTitle');
   const cr=$('credText'); if(cr) cr.textContent=t('cred1');
+  const tn=$('tsNote'); if(tn) tn.textContent=t('tsNote');
   const bb=$('btnBaru'); if(bb) bb.innerHTML=t('baru');
 }
 
